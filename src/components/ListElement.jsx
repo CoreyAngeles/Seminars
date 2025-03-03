@@ -2,20 +2,26 @@ import React, { useState } from "react";
 import styles from "./ListElement.module.scss";
 
 const ListElement = ({ element, onDelete, onUpdate }) => {
+  // состояние открытия модалки после кнопки удалить
   const [isModalOpen, setIsModalOpen] = useState(false);
+  // состояние открытия модалки после кнопки редактировать
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  // состояние поля description которое мы редактируем
   const [editedDescription, setEditedDescription] = useState(
     element.description
   );
 
+  // простая функция на открытие модалки после кнопки удалить
   const handleDeleteClick = () => {
     setIsModalOpen(true);
   };
 
+  // простая функция на открытие модалки после кнопки редактировать
   const handleEditClick = () => {
     setIsEditModalOpen(true);
   };
 
+  // функция на удаление поста из сервера через метод Delete
   const handleConfirmDelete = async () => {
     try {
       const response = await fetch(
@@ -25,6 +31,7 @@ const ListElement = ({ element, onDelete, onUpdate }) => {
 
       if (response.ok) {
         alert("Семинар успешно удален");
+        // передаем id поста родителю
         onDelete(element.id);
       } else {
         console.log("Ошибка при удалении семинара");
@@ -32,14 +39,17 @@ const ListElement = ({ element, onDelete, onUpdate }) => {
     } catch (error) {
       console.log(error);
     } finally {
+      // после всех операций закрываем модалку
       setIsModalOpen(false);
     }
   };
 
+  // простая функция закрытия модалки на кнопку отмена
   const handleCancelDelete = () => {
     setIsModalOpen(false);
   };
 
+  //функция отправки запроса на сервер через метод Patch при нажатии на кнопку сохранить
   const handleSaveEdit = async () => {
     try {
       const response = await fetch(
@@ -54,9 +64,12 @@ const ListElement = ({ element, onDelete, onUpdate }) => {
       console.log(response);
 
       if (response.ok) {
+        // получаем наш обновленный пост
         const updatedSeminar = await response.json();
         alert("Описание успешно обновлено");
+        // передаем наш обновленный пост родителю
         onUpdate(updatedSeminar);
+        // закрываем модалку
         setIsEditModalOpen(false);
       } else {
         console.log("Ошибка при обновлении описания");
@@ -65,9 +78,10 @@ const ListElement = ({ element, onDelete, onUpdate }) => {
       console.log(error);
     }
   };
-
+  // функция если мы отменяем редактирования поста
   const handleCancelEdit = () => {
     setIsEditModalOpen(false);
+    // обновляем состояние description т.к textarea У нас контролируемый.
     setEditedDescription(element.description);
   };
 
